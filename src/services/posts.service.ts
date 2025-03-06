@@ -13,9 +13,7 @@ const createPost = async ({
     for (const file of files) {
       formData.append("attachments", file);
     }
-    console.log(formData);
     const res = await api.postFormData("/post", formData);
-    console.log(res);
     return res;
   } catch (error) {
     return error;

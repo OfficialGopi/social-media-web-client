@@ -1,17 +1,22 @@
+import {
+  setAccessToken,
+  setRefreshToken,
+  tokens,
+} from "../constants/tokens.constants";
 import { api } from "../utils/ApiConfig";
 
 const autoLogin = async () => {
   try {
-    const res = await api.post("/user/auto-login", "application/json");
+    const res = await api.post<{
+      tokens: {
+        accessToken: string;
+        refreshToken: string;
+      };
+      info: any;
+    }>("/user/auto-login", {}, tokens as HeadersInit);
     if (res.success) {
-      localStorage.setItem(
-        "access-token",
-        "Bearer " + res.data.tokens.accessToken
-      );
-      localStorage.setItem(
-        "refresh-token",
-        "Bearer " + res.data.tokens.refreshToken
-      );
+      setAccessToken(res.data.tokens.accessToken);
+      setRefreshToken(res.data.tokens.refreshToken);
     }
     return res;
   } catch (error) {
@@ -27,18 +32,20 @@ const loginWithUserDetailsAndPassword = async ({
   password: string;
 }) => {
   try {
-    const res = await api.post("/user/login", "application/json", {
+    const res = await api.post<{
+      tokens: {
+        accessToken: string;
+        refreshToken: string;
+      };
+      info: any;
+    }>("/user/login", {
       userAccessDetails,
       password,
     });
-    localStorage.setItem(
-      "access-token",
-      "Bearer " + res.data.tokens.accessToken
-    );
-    localStorage.setItem(
-      "refresh-token",
-      "Bearer " + res.data.tokens.refreshToken
-    );
+    setAccessToken(res.data.tokens.accessToken);
+    setRefreshToken(res.data.tokens.refreshToken);
+
+    return res;
   } catch (error) {
     return error;
   }

@@ -6,13 +6,6 @@ const useSelectorHook = (feature: string) => () => {
 };
 
 const useUserSelector = useSelectorHook("user");
-const useSocialDataSelector = useSelectorHook("socialData");
-const useDialogSelector = useSelectorHook("dialog");
-const usePostsSelector = useSelectorHook("posts");
+const useAsideSelector = useSelectorHook("aside");
 
-export {
-  useUserSelector,
-  useSocialDataSelector,
-  useDialogSelector,
-  usePostsSelector,
-};
+export { useUserSelector, useAsideSelector };

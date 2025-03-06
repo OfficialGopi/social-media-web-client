@@ -1,19 +1,14 @@
 import { useEffect } from "react";
 import AppLayout from "../components/layouts/AppLayout";
-import {
-  useSetAllDialogCloseDispatcher,
-  useSetPageNotInboxDispatcher,
-} from "../hooks/dispatchHook";
-const Home = () => {
-  const setAllDialogClose = useSetAllDialogCloseDispatcher();
-  const setPageNotInbox = useSetPageNotInboxDispatcher();
+import { useOpenAside } from "../hooks/dispatchHook";
 
+const Home = () => {
+  const openAside = useOpenAside();
   useEffect(() => {
-    setPageNotInbox();
-    setAllDialogClose();
+    openAside();
   }, []);
 
-  return <></>;
+  return <div>Home</div>;
 };
 
 export default AppLayout()(Home);

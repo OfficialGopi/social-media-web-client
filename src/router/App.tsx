@@ -1,21 +1,25 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "../utils/ProtectedRoute";
-import Loader from "../components/Loader/Loader";
 import { useLoginDispatcher, useLogoutDispatcher } from "../hooks/dispatchHook";
 import { autoLogin } from "../services/users.service";
 import { useUserSelector } from "../hooks/selectorHook";
-import { Toaster } from "react-hot-toast";
 
-const Login = lazy(() => import("../app/Login"));
+import {
+  getAccessToken,
+  getRefreshToken,
+  resetTokens,
+} from "../constants/tokens.constants";
+
+const Login = lazy(() => import("../app/Login.tsx"));
 const Register = lazy(() => import("../app/Register"));
 const Home = lazy(() => import("../app/Home"));
 const Profile = lazy(() => import("../app/Profile"));
 const Reels = lazy(() => import("../app/Reels"));
-const Inbox = lazy(() => import("../app/Inbox"));
 const Explore = lazy(() => import("../app/Explore"));
-const ChatSection = lazy(() => import("../components/specific/ChatSection"));
-const NoChat = lazy(() => import("../components/specific/NoChat"));
+const Inbox = lazy(() => import("../app/Inbox.tsx"));
+const Direct = lazy(() => import("../app/Direct.tsx"));
+const Message = lazy(() => import("../app/Message.tsx"));
 
 const App = () => {
   const [inLoading, setLoading] = useState(true);
@@ -25,18 +29,15 @@ const App = () => {
   const user = useUserSelector();
 
   useEffect(() => {
+    setLoading(true);
     if (!user.isAuthenticated) {
-      if (
-        localStorage.getItem("access-token") &&
-        localStorage.getItem("refresh-token")
-      ) {
+      if (getAccessToken() && getRefreshToken()) {
         autoLogin()
-          .then((data) => {
+          .then((data: any) => {
             if (data.success) {
               login(data.data.info);
             } else {
-              localStorage.removeItem("access-token");
-              localStorage.removeItem("refresh-token");
+              resetTokens();
               logout();
             }
           })
@@ -46,16 +47,17 @@ const App = () => {
       } else {
         setLoading(false);
       }
+    } else {
+      setLoading(false);
     }
   }, [user.isAuthenticated]);
 
   return (
     <Router>
-      <Suspense fallback={<Loader />}>
-        <Toaster position="top-right" />
+      <Suspense fallback={<>Loding</>}>
         <Routes>
           {inLoading ? (
-            <Route path="*" element={<Loader />} />
+            <Route path="*" element={<>Loading</>} />
           ) : (
             <>
               <Route
@@ -76,9 +78,11 @@ const App = () => {
                 <Route path="/:username" element={<Profile />} />
                 <Route path="/explore" element={<Explore />} />
                 <Route path="/reels" element={<Reels />} />
-                <Route path="/direct/inbox/" element={<Inbox />}>
-                  <Route path="" element={<NoChat />} />
-                  <Route path=":id" element={<ChatSection />} />
+                <Route element={<Direct isInChat={false} />}>
+                  <Route path="/direct/inbox/" element={<Inbox />} />
+                </Route>
+                <Route element={<Direct isInChat={true} />}>
+                  <Route path="/direct/chat/:chatId" element={<Message />} />
                 </Route>
                 <Route path="*" element={<>404 Not Found</>} />
               </Route>

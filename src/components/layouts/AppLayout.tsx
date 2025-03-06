@@ -1,28 +1,28 @@
-import Aside from "../shared/Aside";
-import Footer from "../shared/Footer";
-import Header from "../shared/Header";
-import { useDialogSelector } from "../../hooks/selectorHook";
 import { JSX, PropsWithChildren } from "react";
+import Aside from "../shared/Aside";
+import { useAsideSelector } from "../../hooks/selectorHook";
+import BottomNavbar from "../shared/BottomNavbar";
 
 const AppLayout =
-  () => (WrappedComponent: (props: PropsWithChildren<{}>) => JSX.Element) => {
+  () => (WrappedComponent: (props: PropsWithChildren<any>) => JSX.Element) => {
     return (props: PropsWithChildren) => {
-      const { isAsideOpen } = useDialogSelector();
+      const { isOpen } = useAsideSelector();
       return (
         <>
-          <main className="w-screen flex flex-col md:flex-row   h-screen">
-            <Header />
-            <Aside />
-            <section
-              className={`flex w-full h-[calc(100%-108px)]  md:w-[calc(100%-73px)] overflow-y-scroll md:h-full ${
-                isAsideOpen
-                  ? "md:w-[calc(100%-73px)] lg:w-[calc(100%-245px)] xl:w-[calc(100%-336px)] "
-                  : ""
-              }`}
+          <main className="w-screen flex sm:flex-row overflow-x-hidden">
+            <aside
+              className={`w-0 z-0 sticky top-0 left-0 hidden sm:flex sm:flex-col  sm:w-[72px]  border ${
+                isOpen && "lg:w-[240px]"
+              } transition-width duration-500`}
             >
+              <Aside />
+            </aside>
+            <section className="flex-1 h-screen border mb-[48px] sm:mt-0 sm:mb-0 overflow-hidden">
               <WrappedComponent {...props} />
-              <Footer />
             </section>
+            <nav className="fixed bottom-0 left-0 h-[48px] flex sm:hidden border w-full">
+              <BottomNavbar />
+            </nav>
           </main>
         </>
       );
